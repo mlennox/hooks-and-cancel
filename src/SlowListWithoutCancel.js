@@ -6,11 +6,9 @@ function App() {
   const [slowData, isLoadingSlowData] = useNoCancelRequest({ url: 'http://localhost:9000/slow', id: 'slow_no_cancel' });
 
   return (
-    <article>
-      <section>
-        {isLoadingSlowData ? `Loading slow data with no cancel...` : <DataList data={slowData}></DataList>}
-      </section>
-    </article>
+    <section>
+      {isLoadingSlowData ? <p className={`loading`}>Loading slow data with no cancel...</p> : <DataList data={slowData}></DataList>}
+    </section>
   );
 }
 

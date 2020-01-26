@@ -1,73 +1,70 @@
-# hooks-and-cancel
+# Hooks and cancel
+
 React hooks and cancelling in-flight requests when unmounting components
 
+## Pre-requisites
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This was built using node 12.7.0 and yarn 1.21.1
 
-## Available Scripts
+Install all the dependencies using
 
-In the project directory, you can run:
+```bash
+$ yarn install
+```
 
-### `yarn start`
+## Running
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This demo runs a (hapi)[https://hapi.dev/] based server to serve Ajax requests, and a dev server to display the site, you'll need to run both. This will require two console windows. In the first, start the hapi server.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+```bash
+$ yarn server
+```
 
-### `yarn test`
+and then you can start the demo using
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+$ yarn start
+```
 
-### `yarn build`
+## What is it all about?
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The demo is code supporting an article []() that discusses some common issues with hooks and axios (or other) rest clients namely loading state and handling unmounted components.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## REST clients
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+There are a few pain points with managing REST requests in your UI - loading states, error states, and in React, handling what happens when you unmount the component _before_ the request response is received. A decent REST client should implement a promise based API so handling errors _should_ be straightforward, but this is complicated when components are unmounted.
 
-### `yarn eject`
+### Handling unmounted components
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Usually a boolean property named `isMounted` is used to track whether the component is mounted. This property needs to be updated whenever the component is mounted or unmounted and must be checked before state or anything with a side-effect is executed.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Cancelling requests
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+[Axios](https://github.com/axios/axios) and other REST client allow you to cancel in-flight requests, meaning the promise will not be fulfilled. Ideally any in-flight requests should be cancelled when a component is unmounted.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Enhanced client
 
-## Learn More
+The suggested 'enhanced client' presented in the demo incorporates the loading state and offers a simple API to facilitate cancelling requests.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## The demo
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![](./public/screen-loading.png)
 
-### Code Splitting
+When you run the demo you will see a list of navigation links and a list of items generated from the 'quick' load, and two loading states indicating that the slow loads are in-flight.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+You should open the developer tools in your browser to see the problem with non-cancellable requests.
 
-### Analyzing the Bundle Size
+### Non-cancelled requests and unmounting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+If you click on the `Go to other page` link before the slow loading requests complete and watch the console you will see the issue when the non-cancellable requests returns.
 
-### Making a Progressive Web App
+```
+index.js:1 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+    in App (at App.js:21)
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+Unless we track the mounted state of the component with something like an `isMounted` property - which adds a lot of overhead and unwanted complexity - we will see this issue.
 
-### Advanced Configuration
+### Cancelled request
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-
+The cancelled request does not try and update the state of the unmounted component.

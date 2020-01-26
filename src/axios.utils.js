@@ -44,10 +44,10 @@ export const createClient = ({ url, id, method, ...config }, setIsLoading = () =
 
 export const createClientWithoutCancel = ({ url, id, method, ...config }, setIsLoading = () => { }) => {
   const { client } = createAxios(config);
-  return () => {
+  return async () => {
     setIsLoading(true);
     console.log(`${id} : About to fetch data`, url);
-    return client.request({
+    return await client.request({
       ...config,
       url: url,
       method: method || 'GET',

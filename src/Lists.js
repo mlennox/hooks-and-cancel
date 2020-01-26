@@ -23,18 +23,17 @@ function App() {
   ] = useDummyData();
 
   return (
-    <article>
+    <>
       <section>
-        {isLoadingQuickData ? `Loading quick data...` : <DataList data={quickData}></DataList>}
-      </section>
-
-      <section>
-        {isLoadingSlowData ? `Loading slow data...` : <DataList data={slowData}></DataList>}
+        {isLoadingQuickData ? <p className={`loading`}>Loading quick data...</p> : <DataList data={quickData}></DataList>}
       </section>
       <section>
-        {isLoadingSlowDataNoCancel ? `Loading slow, no-cancel data...` : <DataList data={slowDataNoCancel}></DataList>}
+        {isLoadingSlowData ? <p className={`loading`}>Loading slow data...</p> : <DataList data={slowData}></DataList>}
       </section>
-    </article>
+      <section>
+        {isLoadingSlowDataNoCancel ? <p className={`loading`}>Loading slow, no-cancel data...</p> : <DataList data={slowDataNoCancel}></DataList>}
+      </section>
+    </>
   );
 }
 

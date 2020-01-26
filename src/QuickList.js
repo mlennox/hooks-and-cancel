@@ -6,11 +6,9 @@ function App() {
   const [quickData, isLoadingQuickData] = useEnhancedRequest({ url: 'http://localhost:9000/quick', id: 'quick' });
 
   return (
-    <article>
-      <section>
-        {isLoadingQuickData ? `Loading quick data...` : <DataList data={quickData}></DataList>}
-      </section>
-    </article>
+    <section>
+      {isLoadingQuickData ? <p className={`loading`}>Loading quick data...</p> : <DataList data={quickData}></DataList>}
+    </section>
   );
 }
 
