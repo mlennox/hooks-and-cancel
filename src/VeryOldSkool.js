@@ -1,13 +1,13 @@
 import React from 'react';
 import { DataList } from './DataList';
-import { createClient } from './axios.utils';
+import { createClientWithoutCancel } from './axios.utils';
 
-class OldStyle extends React.Component {
+class VeryOldStyle extends React.Component {
   constructor() {
     super();
-    const { client, cancel } = createClient({ url: 'http://localhost:9000/slow', id: 'oldSkool' });
+    const client = createClientWithoutCancel({ url: 'http://localhost:9000/slow', id: 'oldSkool' });
     this.client = client;
-    this.cancel = cancel;
+    this._isMounted = false;
     this.state = {
       isLoading: false,
       list: []
@@ -15,19 +15,21 @@ class OldStyle extends React.Component {
   }
 
   async componentDidMount() {
+    this._isMounted = true;
     this.setState({ isLoading: true });
     await this.client()
       .then(result => {
-        this.setState({
-          isLoading: false,
-          list: result
-        })
+        this._isMounted &&
+          this.setState({
+            isLoading: false,
+            list: result.data
+          })
       })
-      .catch(console.error);
+      .catch(() => { this.setState({ isLoading: false }); })
   }
 
   componentWillUnmount() {
-    this.cancel();
+    this._isMounted = false;
   }
 
   render() {
@@ -37,4 +39,4 @@ class OldStyle extends React.Component {
   }
 }
 
-export default OldStyle;
+export default VeryOldStyle;
